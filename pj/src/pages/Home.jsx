@@ -361,8 +361,8 @@ export default function Home({ setBottomSheetOpen }) {
     const fetchWeatherData = async () => {
       try {
         setLoading(true);
-        // 기본 위치로 서울 사용 (실제로는 사용자 위치 또는 저장된 위치 사용)
-        const data = await weatherAPI.getCurrentWeather(37.5665, 126.9780);
+        // 실제 현재 위치(안산시) 사용
+        const data = await weatherAPI.getCurrentWeather(37.3030912, 126.8383744);
         setWeatherData(data);
       } catch (error) {
         console.error('날씨 데이터 조회 실패:', error);
@@ -371,8 +371,8 @@ export default function Home({ setBottomSheetOpen }) {
           temperature: 17,
           minTemperature: 16,
           maxTemperature: 20,
-          weatherCondition: '비',
-          location: '서울',
+          weatherCondition: '맑음',
+          location: '안산시',
           details: {
             precipitation: 12,
             feelsLike: 15,
@@ -402,6 +402,21 @@ export default function Home({ setBottomSheetOpen }) {
   // 바텀시트 컨테이너 클릭 시 이벤트 전파 방지
   const handleSheetContainerClick = (e) => {
     e.stopPropagation();
+  };
+
+  // 날씨 이모티콘 반환 함수
+  const getWeatherEmoji = (condition) => {
+    switch (condition) {
+      case '맑음': return '☀️';
+      case '구름 많음': return '⛅';
+      case '흐림': return '☁️';
+      case '비': return '🌧️';
+      case '눈': return '❄️';
+      case '안개': return '🌫️';
+      case '소나기': return '🌦️';
+      case '천둥번개': return '⛈️';
+      default: return '🌤️';
+    }
   };
 
   if (loading) {
@@ -447,7 +462,7 @@ export default function Home({ setBottomSheetOpen }) {
             <LocationTempWrapper>
               <LocationRow>
                 <LocationIcon src={locationIcon} />
-                <Location>{weatherData?.location || '서울'} | {weatherData?.weatherCondition || '맑음'}</Location>
+                <Location>{weatherData?.location || '안산시'} | {getWeatherEmoji(weatherData?.weatherCondition || '맑음')}</Location>
               </LocationRow>
               <TempRow>
                 <Temp>
@@ -477,7 +492,7 @@ export default function Home({ setBottomSheetOpen }) {
         <BottomSheetContainer open={sheetOpen} onClick={handleSheetContainerClick}>
           <BottomSheetHandle onClick={handleToggleSheet} />
           <BottomSheetContent>
-            <SheetTitle>남은 하루 동안<br/>{weatherData?.weatherCondition || '맑음'}이 계속 이어질 예정이에요.</SheetTitle>
+            <SheetTitle>남은 하루 동안<br/>{getWeatherEmoji(weatherData?.weatherCondition || '맑음')}이 계속 이어질 예정이에요.</SheetTitle>
             <SheetDesc></SheetDesc>
             <SheetRow>
               <SheetLabel><img src={rain} alt="rain" style={{width:24,height:24,marginRight:8}} />강수량 <SheetBadge color="#97FE76">{weatherData?.details?.precipitationLevel || '보통'}</SheetBadge></SheetLabel>

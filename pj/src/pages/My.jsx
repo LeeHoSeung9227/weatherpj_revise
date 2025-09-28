@@ -505,7 +505,7 @@ export default function My() {
   const [selectedType, setSelectedType] = useState('DAY');
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState('default-user');
-  const [currentLocation, setCurrentLocation] = useState('안산시');
+  const [currentLocation, setCurrentLocation] = useState('서울');
   const [currentWeather, setCurrentWeather] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
   
@@ -631,27 +631,43 @@ export default function My() {
   const getCurrentLocationAndWeather = async () => {
     setLocationLoading(true);
     try {
-      // 브라우저의 Geolocation API 사용
+      // 브라우저의 Geolocation API 사용하여 실제 현재 위치 가져오기
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
             console.log('현재 위치:', latitude, longitude);
             
-            // 백엔드 API로 위치 및 날씨 정보 가져오기
+            // 백엔드 API로 위치 및 날씨 정보 가져오기 (Open-Meteo 사용)
             try {
               const result = await weatherAPI.getCurrentWeather(latitude, longitude);
-              setCurrentLocation(result.city || '안산시');
-              setCurrentWeather(result.weather);
+              setCurrentLocation(result.location || '현재 위치');
+              setCurrentWeather({
+                temperature: result.temperature,
+                weatherCondition: result.weatherCondition,
+                details: result.details
+              });
               console.log('위치 및 날씨 정보:', result);
             } catch (apiError) {
               console.error('백엔드 API 호출 실패:', apiError);
-              setCurrentLocation('안산시');
+              // 기본값 설정
+              setCurrentLocation('현재 위치');
+              setCurrentWeather({
+                temperature: 17,
+                weatherCondition: '맑음',
+                details: { humidity: 50 }
+              });
             }
           },
           (error) => {
             console.error('위치 정보 가져오기 실패:', error);
-            setCurrentLocation('안산시');
+            // 위치 정보를 가져올 수 없을 때 기본값 사용
+            setCurrentLocation('현재 위치');
+            setCurrentWeather({
+              temperature: 17,
+              weatherCondition: '맑음',
+              details: { humidity: 50 }
+            });
           },
           {
             enableHighAccuracy: true,
@@ -661,11 +677,21 @@ export default function My() {
         );
       } else {
         console.log('Geolocation이 지원되지 않습니다.');
-        setCurrentLocation('안산시');
+        setCurrentLocation('현재 위치');
+        setCurrentWeather({
+          temperature: 17,
+          weatherCondition: '맑음',
+          details: { humidity: 50 }
+        });
       }
     } catch (error) {
       console.error('위치 및 날씨 정보 가져오기 실패:', error);
-      setCurrentLocation('안산시');
+      setCurrentLocation('현재 위치');
+      setCurrentWeather({
+        temperature: 17,
+        weatherCondition: '맑음',
+        details: { humidity: 50 }
+      });
     } finally {
       setLocationLoading(false);
     }
@@ -677,10 +703,14 @@ export default function My() {
     
     const desc = weatherDesc.toLowerCase();
     if (desc.includes('맑음') || desc.includes('clear')) return '☀️';
-    if (desc.includes('흐림') || desc.includes('cloudy')) return '☁️';
+    if (desc.includes('구름') || desc.includes('cloudy')) return '⛅';
+    if (desc.includes('흐림') || desc.includes('overcast')) return '☁️';
     if (desc.includes('비') || desc.includes('rain')) return '🌧️';
     if (desc.includes('눈') || desc.includes('snow')) return '❄️';
     if (desc.includes('안개') || desc.includes('fog')) return '🌫️';
+    if (desc.includes('소나기') || desc.includes('shower')) return '🌦️';
+    if (desc.includes('천둥') || desc.includes('thunder')) return '⛈️';
+    if (desc.includes('이슬비')) return '🌦️';
     return '🌤️';
   };
 
@@ -731,9 +761,9 @@ export default function My() {
                 {locationLoading ? '위치 확인 중...' : currentLocation}
                 {currentWeather && (
                   <span style={{ marginLeft: 8, fontSize: '12px', opacity: 0.8 }}>
-                    {getWeatherIcon(currentWeather.current_condition?.[0]?.weatherDesc?.[0]?.value)}
+                    {getWeatherIcon(currentWeather.weatherCondition)}
                     {' '}
-                    {currentWeather.current_condition?.[0]?.temp_C}°C
+                    {currentWeather.temperature}°C
                   </span>
                 )}
               </span>

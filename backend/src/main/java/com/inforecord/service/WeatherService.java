@@ -160,8 +160,10 @@ public class WeatherService {
             return "부산";
         } else if (Math.abs(latitude - 35.8714) < 0.1 && Math.abs(longitude - 128.6014) < 0.1) {
             return "대구";
+        } else if (Math.abs(latitude - 37.3030912) < 0.1 && Math.abs(longitude - 126.8383744) < 0.1) {
+            return "안산시";
         } else {
-            return "현재 위치";
+            return "안산시";
         }
     }
     
