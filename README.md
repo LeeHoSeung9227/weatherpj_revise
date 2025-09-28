@@ -1,4 +1,4 @@
-# 🌤️ Weather Diary - AI 감정분석 기반 날씨 다이어리
+# 🌤️ 기분청 - AI 감정분석 기반 날씨 다이어리
 
 AI 기술을 활용한 감정 분석과 날씨 정보를 결합한 새로운 개념의 다이어리 서비스
 
@@ -204,8 +204,6 @@ npm start
 ## 🌟 성과
 - AI 모델 정확도 87% 달성
 - 평균 응답 시간 200ms 이하 유지
-- 일 평균 1,000건 이상의 감정 분석 처리
-- 사용자 만족도 4.5/5.0 달성
 
 ## 🔗 참고
-This project is based on [pyemd](https://github.com/wmayner/pyemd) and is licensed under the MIT License.
+This project is based on (https://github.com/seo0917/Weatherpj) and is licensed under the MIT License.
